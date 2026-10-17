@@ -7,6 +7,12 @@
     <persistence-unit name="lab1" transaction-type="JTA">
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <jta-data-source>java:jboss/datasources/LabDS</jta-data-source>
+        <class>ru.itmo.is.model.Coordinates</class>
+        <class>ru.itmo.is.model.Discipline</class>
+        <class>ru.itmo.is.model.Location</class>
+        <class>ru.itmo.is.model.Person</class>
+        <class>ru.itmo.is.model.LabWork</class>
+        <class>ru.itmo.is.model.ZonedDateTimeConverter</class>
 
         <properties>
             <property name="jboss.as.jpa.providerModule" value="application"/>

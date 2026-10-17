@@ -26,6 +26,7 @@ public abstract class BaseRepository<T, ID> {
 
     public T save(T entity) {
         em.persist(entity);
+        em.flush();
         return entity;
     }
 
