@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { api } from '../api';
 import { COLUMNS, GROUP_ROW, cellValue } from '../columns';
-import ConfirmDelete from '../components/ConfirmDelete';
-import LabWorkDetails from '../components/LabWorkDetails';
+import LabWorkDelete from '../components/LabWorkDelete';
 import LabWorkForm from '../components/LabWorkForm';
+import LabWorkView from '../components/LabWorkView';
 import Modal from '../components/Modal';
 import { useChanges } from '../events';
 
@@ -124,20 +124,15 @@ export default function LabWorksPage() {
       </div>
       {dialog && (
         <Modal title={TITLES[dialog.type]} onClose={closeDialog}>
-          {dialog.type === 'view' && <LabWorkDetails labWork={dialog.labWork} />}
+          {dialog.type === 'view' && (
+            <LabWorkView labWork={dialog.labWork} onClose={closeDialog}
+                         onEdit={() => setDialog({ type: 'edit', labWork: dialog.labWork })}
+                         onDelete={() => setDialog({ type: 'delete', labWork: dialog.labWork })} />
+          )}
           {(dialog.type === 'create' || dialog.type === 'edit') && (
             <LabWorkForm labWork={dialog.labWork} onSaved={closeDialog} onCancel={closeDialog} />
           )}
-          {dialog.type === 'delete' && (
-            <ConfirmDelete
-              text={`Удалить лабораторную «${dialog.labWork.name}» (ID ${dialog.labWork.id})?`}
-              onConfirm={async () => {
-                await api.delete('/labworks/' + dialog.labWork.id);
-                closeDialog();
-              }}
-              onCancel={closeDialog}
-            />
-          )}
+          {dialog.type === 'delete' && <LabWorkDelete labWork={dialog.labWork} onDone={closeDialog} />}
         </Modal>
       )}
       {error && <p className="error">{error}</p>}

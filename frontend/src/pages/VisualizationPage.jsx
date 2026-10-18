@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import ClusterList from '../components/ClusterList';
-import LabWorkDetails from '../components/LabWorkDetails';
+import LabWorkDelete from '../components/LabWorkDelete';
 import LabWorkForm from '../components/LabWorkForm';
+import LabWorkView from '../components/LabWorkView';
 import Modal from '../components/Modal';
 import ScatterChart from '../components/ScatterChart';
 import { DIFFICULTIES, DIFFICULTY_COLORS } from '../enums';
@@ -12,6 +13,7 @@ const TITLES = {
   cluster: (dialog) => `Лабораторные в этой точке: ${dialog.labWorks.length}`,
   view: () => 'Информация о лабораторной',
   edit: () => 'Изменение лабораторной',
+  delete: () => 'Удаление лабораторной',
 };
 
 export default function VisualizationPage() {
@@ -78,20 +80,14 @@ export default function VisualizationPage() {
                          onOpen={(labWork) => setDialog({ type: 'view', labWork })} />
           )}
           {dialog.type === 'view' && (
-            <>
-              <LabWorkDetails labWork={dialog.labWork} />
-              <div className="form-buttons">
-                <button type="button" className="primary"
-                        onClick={() => setDialog({ type: 'edit', labWork: dialog.labWork })}>
-                  Изменить
-                </button>
-                <button type="button" onClick={closeDialog}>Закрыть</button>
-              </div>
-            </>
+            <LabWorkView labWork={dialog.labWork} onClose={closeDialog}
+                         onEdit={() => setDialog({ type: 'edit', labWork: dialog.labWork })}
+                         onDelete={() => setDialog({ type: 'delete', labWork: dialog.labWork })} />
           )}
           {dialog.type === 'edit' && (
             <LabWorkForm labWork={dialog.labWork} onSaved={closeDialog} onCancel={closeDialog} />
           )}
+          {dialog.type === 'delete' && <LabWorkDelete labWork={dialog.labWork} onDone={closeDialog} />}
         </Modal>
       )}
     </section>
