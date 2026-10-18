@@ -5,8 +5,10 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import java.util.List;
+import java.util.Map;
 import ru.itmo.is.dto.LabWorkDetailsDto;
 import ru.itmo.is.dto.LabWorkDto;
+import ru.itmo.is.dto.PageDto;
 import ru.itmo.is.model.LabWork;
 import ru.itmo.is.repository.BaseRepository;
 import ru.itmo.is.repository.CoordinatesRepository;
@@ -16,6 +18,8 @@ import ru.itmo.is.repository.PersonRepository;
 
 @ApplicationScoped
 public class LabWorkService {
+
+    private static final int MAX_PAGE_SIZE = 100;
 
     @Inject
     LabWorkRepository repository;
@@ -50,8 +54,28 @@ public class LabWorkService {
         return toDetailsDto(findOrThrow(id));
     }
 
-    public List<LabWorkDto> list() {
-        return repository.findAll().stream().map(this::toDto).toList();
+    public PageDto<LabWorkDetailsDto> list(int page, int size, String sort, String order,
+                                           Map<String, String> filters) {
+        if (page < 0) {
+            throw new FieldException("page", "Номер страницы не может быть отрицательным");
+        }
+        if (size < 1 || size > MAX_PAGE_SIZE) {
+            throw new FieldException("size", "Размер страницы должен быть от 1 до " + MAX_PAGE_SIZE);
+        }
+        if (!LabWorkRepository.SORTABLE.contains(sort)) {
+            throw new FieldException("sort", "Сортировка по колонке " + sort + " не поддерживается");
+        }
+        if (!order.equals("asc") && !order.equals("desc")) {
+            throw new FieldException("order", "Допустимые значения: asc, desc");
+        }
+        for (String column : filters.keySet()) {
+            if (!LabWorkRepository.FILTERABLE.contains(column)) {
+                throw new FieldException(column, "Фильтр по этой колонке не поддерживается");
+            }
+        }
+        List<LabWorkDetailsDto> items = repository.findPage(filters, sort, order.equals("asc"), page, size)
+                .stream().map(this::toDetailsDto).toList();
+        return new PageDto<>(items, repository.count(filters), page, size);
     }
 
     @Transactional
