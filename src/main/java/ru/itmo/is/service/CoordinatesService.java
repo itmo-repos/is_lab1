@@ -6,6 +6,8 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import ru.itmo.is.dto.CoordinatesDto;
+import ru.itmo.is.exception.ConflictException;
+import ru.itmo.is.exception.FieldException;
 import ru.itmo.is.model.Coordinates;
 import ru.itmo.is.model.LabWork;
 import ru.itmo.is.repository.CoordinatesRepository;

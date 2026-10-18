@@ -5,7 +5,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 import java.util.Map;
-import ru.itmo.is.service.ConflictException;
+import ru.itmo.is.exception.ConflictException;
 
 @Provider
 public class ConflictExceptionMapper implements ExceptionMapper<ConflictException> {

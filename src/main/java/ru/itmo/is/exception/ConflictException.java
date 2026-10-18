@@ -1,4 +1,4 @@
-package ru.itmo.is.service;
+package ru.itmo.is.exception;
 
 public class ConflictException extends RuntimeException {
 

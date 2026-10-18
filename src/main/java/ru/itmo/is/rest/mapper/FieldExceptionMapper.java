@@ -7,7 +7,7 @@ import jakarta.ws.rs.ext.Provider;
 import java.util.List;
 import java.util.Map;
 import ru.itmo.is.dto.FieldErrorDto;
-import ru.itmo.is.service.FieldException;
+import ru.itmo.is.exception.FieldException;
 
 @Provider
 public class FieldExceptionMapper implements ExceptionMapper<FieldException> {

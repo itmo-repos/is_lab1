@@ -9,6 +9,7 @@ import java.util.Map;
 import ru.itmo.is.dto.LabWorkDetailsDto;
 import ru.itmo.is.dto.LabWorkDto;
 import ru.itmo.is.dto.PageDto;
+import ru.itmo.is.exception.FieldException;
 import ru.itmo.is.model.LabWork;
 import ru.itmo.is.repository.BaseRepository;
 import ru.itmo.is.repository.CoordinatesRepository;
