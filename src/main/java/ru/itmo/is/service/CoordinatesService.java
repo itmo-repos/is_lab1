@@ -1,11 +1,13 @@
 package ru.itmo.is.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import ru.itmo.is.dto.CoordinatesDto;
+import ru.itmo.is.event.ChangedEvent;
 import ru.itmo.is.exception.ConflictException;
 import ru.itmo.is.exception.FieldException;
 import ru.itmo.is.model.Coordinates;
@@ -22,11 +24,15 @@ public class CoordinatesService {
     @Inject
     LabWorkRepository labWorkRepository;
 
+    @Inject
+    Event<ChangedEvent> changes;
+
     @Transactional
     public CoordinatesDto create(CoordinatesDto dto) {
         Coordinates entity = new Coordinates();
         fill(entity, dto);
         repository.save(entity);
+        changes.fire(new ChangedEvent("coordinates"));
         return toDto(entity);
     }
 
@@ -42,6 +48,7 @@ public class CoordinatesService {
     public CoordinatesDto update(Long id, CoordinatesDto dto) {
         Coordinates entity = findOrThrow(id);
         fill(entity, dto);
+        changes.fire(new ChangedEvent("coordinates"));
         return toDto(entity);
     }
 
@@ -59,8 +66,10 @@ public class CoordinatesService {
             }
             Coordinates replacement = findOrThrow(replaceWith);
             labWorks.forEach(labWork -> labWork.setCoordinates(replacement));
+            changes.fire(new ChangedEvent("labwork"));
         }
         repository.delete(entity);
+        changes.fire(new ChangedEvent("coordinates"));
     }
 
     private Coordinates findOrThrow(Long id) {

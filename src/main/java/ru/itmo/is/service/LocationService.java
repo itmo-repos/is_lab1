@@ -1,11 +1,13 @@
 package ru.itmo.is.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import ru.itmo.is.dto.LocationDto;
+import ru.itmo.is.event.ChangedEvent;
 import ru.itmo.is.model.Location;
 import ru.itmo.is.repository.LocationRepository;
 
@@ -15,11 +17,15 @@ public class LocationService {
     @Inject
     LocationRepository repository;
 
+    @Inject
+    Event<ChangedEvent> changes;
+
     @Transactional
     public LocationDto create(LocationDto dto) {
         Location entity = new Location();
         fill(entity, dto);
         repository.save(entity);
+        changes.fire(new ChangedEvent("location"));
         return toDto(entity);
     }
 
@@ -35,12 +41,14 @@ public class LocationService {
     public LocationDto update(Long id, LocationDto dto) {
         Location entity = findOrThrow(id);
         fill(entity, dto);
+        changes.fire(new ChangedEvent("location"));
         return toDto(entity);
     }
 
     @Transactional
     public void delete(Long id) {
         repository.delete(findOrThrow(id));
+        changes.fire(new ChangedEvent("location"));
     }
 
     private Location findOrThrow(Long id) {

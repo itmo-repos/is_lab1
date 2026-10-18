@@ -1,12 +1,14 @@
 package ru.itmo.is.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import ru.itmo.is.dto.PersonDetailsDto;
 import ru.itmo.is.dto.PersonDto;
+import ru.itmo.is.event.ChangedEvent;
 import ru.itmo.is.exception.ConflictException;
 import ru.itmo.is.exception.FieldException;
 import ru.itmo.is.model.LabWork;
@@ -31,11 +33,15 @@ public class PersonService {
     @Inject
     LocationService locationService;
 
+    @Inject
+    Event<ChangedEvent> changes;
+
     @Transactional
     public PersonDto create(PersonDto dto) {
         Person entity = new Person();
         fill(entity, dto);
         repository.save(entity);
+        changes.fire(new ChangedEvent("person"));
         return toDto(entity);
     }
 
@@ -51,6 +57,7 @@ public class PersonService {
     public PersonDto update(Long id, PersonDto dto) {
         Person entity = findOrThrow(id);
         fill(entity, dto);
+        changes.fire(new ChangedEvent("person"));
         return toDto(entity);
     }
 
@@ -68,8 +75,10 @@ public class PersonService {
             }
             Person replacement = findOrThrow(replaceWith);
             labWorks.forEach(labWork -> labWork.setAuthor(replacement));
+            changes.fire(new ChangedEvent("labwork"));
         }
         repository.delete(entity);
+        changes.fire(new ChangedEvent("person"));
     }
 
     private Person findOrThrow(Long id) {

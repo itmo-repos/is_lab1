@@ -1,6 +1,7 @@
 package ru.itmo.is.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
 import ru.itmo.is.dto.AverageDto;
 import ru.itmo.is.dto.GroupCountDto;
 import ru.itmo.is.dto.LabWorkDto;
+import ru.itmo.is.event.ChangedEvent;
 import ru.itmo.is.exception.FieldException;
 import ru.itmo.is.model.Difficulty;
 import ru.itmo.is.model.Discipline;
@@ -29,6 +31,9 @@ public class SpecialService {
 
     @Inject
     LabWorkService labWorkService;
+
+    @Inject
+    Event<ChangedEvent> changes;
 
     public AverageDto averageMinimalPoint() {
         OptionalDouble average = labWorkRepository.findAll().stream()
@@ -67,6 +72,7 @@ public class SpecialService {
         LabWork labWork = findLabWork(id);
         int level = Math.max(0, labWork.getDifficulty().ordinal() - steps);
         labWork.setDifficulty(Difficulty.values()[level]);
+        changes.fire(new ChangedEvent("labwork"));
         return labWorkService.toDto(labWork);
     }
 
@@ -82,6 +88,7 @@ public class SpecialService {
                     "LabWork " + labWorkId + " не входит в программу дисциплины " + disciplineId);
         }
         labWork.setDiscipline(null);
+        changes.fire(new ChangedEvent("labwork"));
         return labWorkService.toDto(labWork);
     }
 

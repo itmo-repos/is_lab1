@@ -1,11 +1,13 @@
 package ru.itmo.is.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import ru.itmo.is.dto.DisciplineDto;
+import ru.itmo.is.event.ChangedEvent;
 import ru.itmo.is.exception.ConflictException;
 import ru.itmo.is.exception.FieldException;
 import ru.itmo.is.model.Discipline;
@@ -22,11 +24,15 @@ public class DisciplineService {
     @Inject
     LabWorkRepository labWorkRepository;
 
+    @Inject
+    Event<ChangedEvent> changes;
+
     @Transactional
     public DisciplineDto create(DisciplineDto dto) {
         Discipline entity = new Discipline();
         fill(entity, dto);
         repository.save(entity);
+        changes.fire(new ChangedEvent("discipline"));
         return toDto(entity);
     }
 
@@ -42,6 +48,7 @@ public class DisciplineService {
     public DisciplineDto update(Long id, DisciplineDto dto) {
         Discipline entity = findOrThrow(id);
         fill(entity, dto);
+        changes.fire(new ChangedEvent("discipline"));
         return toDto(entity);
     }
 
@@ -59,8 +66,10 @@ public class DisciplineService {
             }
             Discipline replacement = findOrThrow(replaceWith);
             labWorks.forEach(labWork -> labWork.setDiscipline(replacement));
+            changes.fire(new ChangedEvent("labwork"));
         }
         repository.delete(entity);
+        changes.fire(new ChangedEvent("discipline"));
     }
 
     private Discipline findOrThrow(Long id) {
