@@ -13,7 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import ru.itmo.is.model.Coordinates;
+import ru.itmo.is.model.Discipline;
 import ru.itmo.is.model.LabWork;
+import ru.itmo.is.model.Person;
 
 @ApplicationScoped
 public class LabWorkRepository extends BaseRepository<LabWork, Integer> {
@@ -47,6 +50,24 @@ public class LabWorkRepository extends BaseRepository<LabWork, Integer> {
         return em.createQuery(query)
                 .setFirstResult(page * size)
                 .setMaxResults(size)
+                .getResultList();
+    }
+
+    public List<LabWork> findByAuthor(Person author) {
+        return em.createQuery("SELECT l FROM LabWork l WHERE l.author = :author", LabWork.class)
+                .setParameter("author", author)
+                .getResultList();
+    }
+
+    public List<LabWork> findByCoordinates(Coordinates coordinates) {
+        return em.createQuery("SELECT l FROM LabWork l WHERE l.coordinates = :coordinates", LabWork.class)
+                .setParameter("coordinates", coordinates)
+                .getResultList();
+    }
+
+    public List<LabWork> findByDiscipline(Discipline discipline) {
+        return em.createQuery("SELECT l FROM LabWork l WHERE l.discipline = :discipline", LabWork.class)
+                .setParameter("discipline", discipline)
                 .getResultList();
     }
 

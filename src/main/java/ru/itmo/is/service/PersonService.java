@@ -7,8 +7,10 @@ import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import ru.itmo.is.dto.PersonDetailsDto;
 import ru.itmo.is.dto.PersonDto;
+import ru.itmo.is.model.LabWork;
 import ru.itmo.is.model.Location;
 import ru.itmo.is.model.Person;
+import ru.itmo.is.repository.LabWorkRepository;
 import ru.itmo.is.repository.LocationRepository;
 import ru.itmo.is.repository.PersonRepository;
 
@@ -20,6 +22,9 @@ public class PersonService {
 
     @Inject
     LocationRepository locationRepository;
+
+    @Inject
+    LabWorkRepository labWorkRepository;
 
     @Inject
     LocationService locationService;
@@ -48,8 +53,21 @@ public class PersonService {
     }
 
     @Transactional
-    public void delete(Long id) {
-        repository.delete(findOrThrow(id));
+    public void delete(Long id, Long replaceWith) {
+        Person entity = findOrThrow(id);
+        List<LabWork> labWorks = labWorkRepository.findByAuthor(entity);
+        if (!labWorks.isEmpty()) {
+            if (replaceWith == null) {
+                throw new ConflictException("Person " + id + " указан автором в лабораторных ("
+                        + labWorks.size() + " шт.), выберите другого автора для замены");
+            }
+            if (replaceWith.equals(id)) {
+                throw new FieldException("replaceWith", "Нельзя заменить автора на него же");
+            }
+            Person replacement = findOrThrow(replaceWith);
+            labWorks.forEach(labWork -> labWork.setAuthor(replacement));
+        }
+        repository.delete(entity);
     }
 
     private Person findOrThrow(Long id) {

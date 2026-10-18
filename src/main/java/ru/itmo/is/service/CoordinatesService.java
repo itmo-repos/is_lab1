@@ -7,13 +7,18 @@ import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import ru.itmo.is.dto.CoordinatesDto;
 import ru.itmo.is.model.Coordinates;
+import ru.itmo.is.model.LabWork;
 import ru.itmo.is.repository.CoordinatesRepository;
+import ru.itmo.is.repository.LabWorkRepository;
 
 @ApplicationScoped
 public class CoordinatesService {
 
     @Inject
     CoordinatesRepository repository;
+
+    @Inject
+    LabWorkRepository labWorkRepository;
 
     @Transactional
     public CoordinatesDto create(CoordinatesDto dto) {
@@ -39,8 +44,21 @@ public class CoordinatesService {
     }
 
     @Transactional
-    public void delete(Long id) {
-        repository.delete(findOrThrow(id));
+    public void delete(Long id, Long replaceWith) {
+        Coordinates entity = findOrThrow(id);
+        List<LabWork> labWorks = labWorkRepository.findByCoordinates(entity);
+        if (!labWorks.isEmpty()) {
+            if (replaceWith == null) {
+                throw new ConflictException("Coordinates " + id + " используется в лабораторных ("
+                        + labWorks.size() + " шт.), выберите другие координаты для замены");
+            }
+            if (replaceWith.equals(id)) {
+                throw new FieldException("replaceWith", "Нельзя заменить объект на него же");
+            }
+            Coordinates replacement = findOrThrow(replaceWith);
+            labWorks.forEach(labWork -> labWork.setCoordinates(replacement));
+        }
+        repository.delete(entity);
     }
 
     private Coordinates findOrThrow(Long id) {

@@ -11,6 +11,7 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
@@ -50,8 +51,8 @@ public class DisciplineResource {
 
     @DELETE
     @Path("/{id}")
-    public Response delete(@PathParam("id") Long id) {
-        service.delete(id);
+    public Response delete(@PathParam("id") Long id, @QueryParam("replaceWith") Long replaceWith) {
+        service.delete(id, replaceWith);
         return Response.noContent().build();
     }
 }
