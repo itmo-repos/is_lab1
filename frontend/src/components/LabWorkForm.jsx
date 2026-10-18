@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api';
 import { DIFFICULTIES } from '../enums';
+import { REFERENCES } from '../references';
 import FormField from './FormField';
+import Modal from './Modal';
+import ReferenceForm from './ReferenceForm';
+import RefSelect from './RefSelect';
 
 const EMPTY = {
   name: '',
@@ -12,6 +16,12 @@ const EMPTY = {
   minimalPoint: '',
   personalQualitiesMinimum: '',
   authorId: '',
+};
+
+const REF_FIELDS = {
+  coordinates: 'coordinatesId',
+  discipline: 'disciplineId',
+  person: 'authorId',
 };
 
 function toNumber(value) {
@@ -42,22 +52,28 @@ export default function LabWorkForm({ labWork, onSaved, onCancel }) {
   const [values, setValues] = useState(() => toValues(labWork));
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState(null);
-  const [coordinates, setCoordinates] = useState([]);
-  const [disciplines, setDisciplines] = useState([]);
-  const [persons, setPersons] = useState([]);
+  const [options, setOptions] = useState({ coordinates: [], discipline: [], person: [] });
+  const [creating, setCreating] = useState(null);
 
   useEffect(() => {
-    Promise.all([api.get('/coordinates'), api.get('/disciplines'), api.get('/persons')])
-      .then(([coordinatesList, disciplinesList, personsList]) => {
-        setCoordinates(coordinatesList);
-        setDisciplines(disciplinesList);
-        setPersons(personsList);
-      })
-      .catch((e) => setMessage(e.message));
+    Object.keys(REF_FIELDS).forEach((key) => {
+      api.get(REFERENCES[key].path)
+        .then((list) => setOptions((current) => ({ ...current, [key]: list })))
+        .catch((e) => setMessage(e.message));
+    });
   }, []);
 
+  function setField(name, value) {
+    setValues((current) => ({ ...current, [name]: value }));
+  }
+
   function change(name) {
-    return (event) => setValues({ ...values, [name]: event.target.value });
+    return (event) => setField(name, event.target.value);
+  }
+
+  function created(key, item) {
+    setOptions((current) => ({ ...current, [key]: [...current[key], item] }));
+    setField(REF_FIELDS[key], String(item.id));
   }
 
   async function submit(event) {
@@ -85,51 +101,59 @@ export default function LabWorkForm({ labWork, onSaved, onCancel }) {
     }
   }
 
+  function refSelect(key, required) {
+    const field = REF_FIELDS[key];
+    return (
+      <RefSelect reference={REFERENCES[key]} options={options[key]} value={values[field]}
+                 required={required} onChange={(value) => setField(field, value)}
+                 onCreate={() => setCreating(key)} />
+    );
+  }
+
   return (
-    <form onSubmit={submit}>
-      <FormField label="Название" error={errors.name}>
-        <input value={values.name} onChange={change('name')} required />
-      </FormField>
-      <FormField label="Описание" error={errors.description}>
-        <input value={values.description} onChange={change('description')} />
-      </FormField>
-      <FormField label="Сложность" error={errors.difficulty}>
-        <select value={values.difficulty} onChange={change('difficulty')} required>
-          <option value="">выберите</option>
-          {DIFFICULTIES.map((d) => <option key={d} value={d}>{d}</option>)}
-        </select>
-      </FormField>
-      <FormField label="Координаты" error={errors.coordinatesId}>
-        <select value={values.coordinatesId} onChange={change('coordinatesId')} required>
-          <option value="">выберите</option>
-          {coordinates.map((c) => <option key={c.id} value={c.id}>{c.id}: ({c.x}; {c.y})</option>)}
-        </select>
-      </FormField>
-      <FormField label="Дисциплина" error={errors.disciplineId}>
-        <select value={values.disciplineId} onChange={change('disciplineId')}>
-          <option value="">нет</option>
-          {disciplines.map((d) => <option key={d.id} value={d.id}>{d.id}: {d.name}</option>)}
-        </select>
-      </FormField>
-      <FormField label="Минимальный балл" error={errors.minimalPoint}>
-        <input type="number" min="0" step="any" value={values.minimalPoint}
-               onChange={change('minimalPoint')} />
-      </FormField>
-      <FormField label="Минимум личных качеств" error={errors.personalQualitiesMinimum}>
-        <input type="number" min="1" step="1" value={values.personalQualitiesMinimum}
-               onChange={change('personalQualitiesMinimum')} />
-      </FormField>
-      <FormField label="Автор" error={errors.authorId}>
-        <select value={values.authorId} onChange={change('authorId')} required>
-          <option value="">выберите</option>
-          {persons.map((p) => <option key={p.id} value={p.id}>{p.id}: {p.name}</option>)}
-        </select>
-      </FormField>
-      {message && <p className="error">{message}</p>}
-      <div className="form-buttons">
-        <button type="submit" className="primary">Сохранить</button>
-        <button type="button" onClick={onCancel}>Отмена</button>
-      </div>
-    </form>
+    <>
+      <form onSubmit={submit}>
+        <FormField label="Название" error={errors.name}>
+          <input value={values.name} onChange={change('name')} required />
+        </FormField>
+        <FormField label="Описание" error={errors.description}>
+          <input value={values.description} onChange={change('description')} />
+        </FormField>
+        <FormField label="Сложность" error={errors.difficulty}>
+          <select value={values.difficulty} onChange={change('difficulty')} required>
+            <option value="">выберите</option>
+            {DIFFICULTIES.map((d) => <option key={d} value={d}>{d}</option>)}
+          </select>
+        </FormField>
+        <FormField label="Координаты" error={errors.coordinatesId}>
+          {refSelect('coordinates', true)}
+        </FormField>
+        <FormField label="Дисциплина" error={errors.disciplineId}>
+          {refSelect('discipline', false)}
+        </FormField>
+        <FormField label="Минимальный балл" error={errors.minimalPoint}>
+          <input type="number" min="0" step="any" value={values.minimalPoint}
+                 onChange={change('minimalPoint')} />
+        </FormField>
+        <FormField label="Минимум личных качеств" error={errors.personalQualitiesMinimum}>
+          <input type="number" min="1" step="1" value={values.personalQualitiesMinimum}
+                 onChange={change('personalQualitiesMinimum')} />
+        </FormField>
+        <FormField label="Автор" error={errors.authorId}>
+          {refSelect('person', true)}
+        </FormField>
+        {message && <p className="error">{message}</p>}
+        <div className="form-buttons">
+          <button type="submit" className="primary">Сохранить</button>
+          <button type="button" onClick={onCancel}>Отмена</button>
+        </div>
+      </form>
+      {creating && (
+        <Modal title={`Создание: ${REFERENCES[creating].title}`} onClose={() => setCreating(null)}>
+          <ReferenceForm reference={REFERENCES[creating]} onDone={() => setCreating(null)}
+                         onSaved={(item) => created(creating, item)} />
+        </Modal>
+      )}
+    </>
   );
 }
