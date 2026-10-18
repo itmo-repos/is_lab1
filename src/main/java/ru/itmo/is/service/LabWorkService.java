@@ -1,6 +1,7 @@
 package ru.itmo.is.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
@@ -9,6 +10,7 @@ import java.util.Map;
 import ru.itmo.is.dto.LabWorkDetailsDto;
 import ru.itmo.is.dto.LabWorkDto;
 import ru.itmo.is.dto.PageDto;
+import ru.itmo.is.event.ChangedEvent;
 import ru.itmo.is.exception.FieldException;
 import ru.itmo.is.model.LabWork;
 import ru.itmo.is.repository.BaseRepository;
@@ -43,11 +45,15 @@ public class LabWorkService {
     @Inject
     PersonService personService;
 
+    @Inject
+    Event<ChangedEvent> changes;
+
     @Transactional
     public LabWorkDto create(LabWorkDto dto) {
         LabWork entity = new LabWork();
         fill(entity, dto);
         repository.save(entity);
+        changes.fire(new ChangedEvent("labwork"));
         return toDto(entity);
     }
 
@@ -83,12 +89,14 @@ public class LabWorkService {
     public LabWorkDto update(Integer id, LabWorkDto dto) {
         LabWork entity = findOrThrow(id);
         fill(entity, dto);
+        changes.fire(new ChangedEvent("labwork"));
         return toDto(entity);
     }
 
     @Transactional
     public void delete(Integer id) {
         repository.delete(findOrThrow(id));
+        changes.fire(new ChangedEvent("labwork"));
     }
 
     private LabWork findOrThrow(Integer id) {
