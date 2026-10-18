@@ -31,9 +31,10 @@ export const GROUP_ROW = [
   { title: '', span: 2 },
   { title: 'Person (автор)', span: 5 },
   { title: 'Location', span: 3 },
+  { title: '', span: 1 },
 ];
 
-function formatDate(value) {
+export function formatDate(value) {
   return new Date(value).toLocaleString();
 }
 

@@ -1,11 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
 import { api } from '../api';
 import { COLUMNS, GROUP_ROW, cellValue } from '../columns';
+import ConfirmDelete from '../components/ConfirmDelete';
+import LabWorkDetails from '../components/LabWorkDetails';
 import LabWorkForm from '../components/LabWorkForm';
 import Modal from '../components/Modal';
 import { useChanges } from '../events';
 
 const PAGE_SIZES = [5, 10, 20, 50];
+const TITLES = {
+  create: 'Создание лабораторной',
+  view: 'Информация о лабораторной',
+  edit: 'Изменение лабораторной',
+  delete: 'Удаление лабораторной',
+};
 
 export default function LabWorksPage() {
   const [data, setData] = useState({ items: [], total: 0 });
@@ -17,7 +25,9 @@ export default function LabWorksPage() {
   const [order, setOrder] = useState('asc');
   const [filters, setFilters] = useState({});
   const [reloadKey, setReloadKey] = useState(0);
-  const [creating, setCreating] = useState(false);
+  const [dialog, setDialog] = useState(null);
+  const [searchId, setSearchId] = useState('');
+  const [searchError, setSearchError] = useState(null);
   const typing = useRef(false);
 
   useChanges(() => setReloadKey((key) => key + 1));
@@ -83,15 +93,51 @@ export default function LabWorksPage() {
     setPage(0);
   }
 
+  async function openById(event) {
+    event.preventDefault();
+    try {
+      const labWork = await api.get('/labworks/' + searchId);
+      setSearchError(null);
+      setDialog({ type: 'view', labWork });
+    } catch (e) {
+      setSearchError(e.message);
+    }
+  }
+
+  function closeDialog() {
+    setDialog(null);
+  }
+
   const pageCount = Math.max(1, Math.ceil(data.total / size));
 
   return (
     <section>
       <h1>Лабораторные работы</h1>
-      <button type="button" onClick={() => setCreating(true)}>Создать</button>
-      {creating && (
-        <Modal title="Создание лабораторной" onClose={() => setCreating(false)}>
-          <LabWorkForm onSaved={() => setCreating(false)} onCancel={() => setCreating(false)} />
+      <div className="toolbar">
+        <button type="button" onClick={() => setDialog({ type: 'create' })}>Создать</button>
+        <form onSubmit={openById}>
+          <input type="number" min="1" step="1" placeholder="ID" value={searchId}
+                 onChange={(e) => setSearchId(e.target.value)} required />
+          <button type="submit">Открыть по ID</button>
+        </form>
+        {searchError && <span className="error">{searchError}</span>}
+      </div>
+      {dialog && (
+        <Modal title={TITLES[dialog.type]} onClose={closeDialog}>
+          {dialog.type === 'view' && <LabWorkDetails labWork={dialog.labWork} />}
+          {(dialog.type === 'create' || dialog.type === 'edit') && (
+            <LabWorkForm labWork={dialog.labWork} onSaved={closeDialog} onCancel={closeDialog} />
+          )}
+          {dialog.type === 'delete' && (
+            <ConfirmDelete
+              text={`Удалить лабораторную «${dialog.labWork.name}» (ID ${dialog.labWork.id})?`}
+              onConfirm={async () => {
+                await api.delete('/labworks/' + dialog.labWork.id);
+                closeDialog();
+              }}
+              onCancel={closeDialog}
+            />
+          )}
         </Modal>
       )}
       {error && <p className="error">{error}</p>}
@@ -110,6 +156,7 @@ export default function LabWorksPage() {
                   {sort === column.key && (order === 'asc' ? ' ▲' : ' ▼')}
                 </th>
               ))}
+              <th>Действия</th>
             </tr>
             <tr>
               {COLUMNS.map((column) => (
@@ -121,6 +168,7 @@ export default function LabWorksPage() {
                   />
                 </th>
               ))}
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -129,6 +177,11 @@ export default function LabWorksPage() {
                 {COLUMNS.map((column) => (
                   <td key={column.key}>{cellValue(row, column)}</td>
                 ))}
+                <td className="actions">
+                  <button type="button" onClick={() => setDialog({ type: 'view', labWork: row })}>Подробнее</button>
+                  <button type="button" onClick={() => setDialog({ type: 'edit', labWork: row })}>Изменить</button>
+                  <button type="button" onClick={() => setDialog({ type: 'delete', labWork: row })}>Удалить</button>
+                </td>
               </tr>
             ))}
           </tbody>

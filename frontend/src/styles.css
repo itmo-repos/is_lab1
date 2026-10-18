@@ -147,3 +147,40 @@ th select {
   gap: 8px;
   margin-top: 16px;
 }
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.toolbar form {
+  display: flex;
+  gap: 6px;
+}
+
+.toolbar input {
+  width: 80px;
+}
+
+.modal h3 {
+  margin: 16px 0 6px;
+  font-size: 15px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 2px 0;
+  font-size: 14px;
+}
+
+.detail-row span:first-child {
+  color: #666;
+}
+
+.actions button + button {
+  margin-left: 4px;
+}

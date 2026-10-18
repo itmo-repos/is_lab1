@@ -18,8 +18,28 @@ function toNumber(value) {
   return value === '' ? null : Number(value);
 }
 
-export default function LabWorkForm({ onSaved, onCancel }) {
-  const [values, setValues] = useState(EMPTY);
+function text(value) {
+  return value === undefined || value === null ? '' : String(value);
+}
+
+function toValues(labWork) {
+  if (!labWork) {
+    return EMPTY;
+  }
+  return {
+    name: labWork.name,
+    coordinatesId: text(labWork.coordinates.id),
+    description: labWork.description,
+    difficulty: labWork.difficulty,
+    disciplineId: text(labWork.discipline?.id),
+    minimalPoint: text(labWork.minimalPoint),
+    personalQualitiesMinimum: text(labWork.personalQualitiesMinimum),
+    authorId: text(labWork.author.id),
+  };
+}
+
+export default function LabWorkForm({ labWork, onSaved, onCancel }) {
+  const [values, setValues] = useState(() => toValues(labWork));
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState(null);
   const [coordinates, setCoordinates] = useState([]);
@@ -53,7 +73,11 @@ export default function LabWorkForm({ onSaved, onCancel }) {
       authorId: toNumber(values.authorId),
     };
     try {
-      await api.post('/labworks', dto);
+      if (labWork) {
+        await api.put('/labworks/' + labWork.id, dto);
+      } else {
+        await api.post('/labworks', dto);
+      }
       onSaved();
     } catch (e) {
       setErrors(e.fields ?? {});
