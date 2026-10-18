@@ -1,0 +1,37 @@
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  color: #222;
+  background: #f5f5f5;
+}
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: 220px;
+  padding: 16px 0;
+  background: #2b3a55;
+}
+
+.menu a {
+  padding: 12px 20px;
+  color: #cfd8e8;
+  text-decoration: none;
+}
+
+.menu a.active {
+  color: #fff;
+  background: #3d5078;
+}
+
+main {
+  flex: 1;
+  min-width: 0;
+  padding: 16px 24px;
+}
