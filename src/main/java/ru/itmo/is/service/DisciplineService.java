@@ -57,7 +57,7 @@ public class DisciplineService {
         entity.setLabsCount(dto.labsCount());
     }
 
-    private DisciplineDto toDto(Discipline entity) {
+    public DisciplineDto toDto(Discipline entity) {
         return new DisciplineDto(entity.getId(), entity.getName(),
                 entity.getPracticeHours(), entity.getLabsCount());
     }

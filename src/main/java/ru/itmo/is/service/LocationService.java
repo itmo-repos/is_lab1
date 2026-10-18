@@ -57,7 +57,7 @@ public class LocationService {
         entity.setName(dto.name() == null || dto.name().isBlank() ? null : dto.name());
     }
 
-    private LocationDto toDto(Location entity) {
+    public LocationDto toDto(Location entity) {
         return new LocationDto(entity.getId(), entity.getX(), entity.getY(), entity.getName());
     }
 }

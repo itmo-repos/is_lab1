@@ -1,0 +1,114 @@
+package ru.itmo.is.service;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import jakarta.ws.rs.NotFoundException;
+import java.util.List;
+import ru.itmo.is.dto.LabWorkDetailsDto;
+import ru.itmo.is.dto.LabWorkDto;
+import ru.itmo.is.model.LabWork;
+import ru.itmo.is.repository.BaseRepository;
+import ru.itmo.is.repository.CoordinatesRepository;
+import ru.itmo.is.repository.DisciplineRepository;
+import ru.itmo.is.repository.LabWorkRepository;
+import ru.itmo.is.repository.PersonRepository;
+
+@ApplicationScoped
+public class LabWorkService {
+
+    @Inject
+    LabWorkRepository repository;
+
+    @Inject
+    CoordinatesRepository coordinatesRepository;
+
+    @Inject
+    DisciplineRepository disciplineRepository;
+
+    @Inject
+    PersonRepository personRepository;
+
+    @Inject
+    CoordinatesService coordinatesService;
+
+    @Inject
+    DisciplineService disciplineService;
+
+    @Inject
+    PersonService personService;
+
+    @Transactional
+    public LabWorkDto create(LabWorkDto dto) {
+        LabWork entity = new LabWork();
+        fill(entity, dto);
+        repository.save(entity);
+        return toDto(entity);
+    }
+
+    public LabWorkDetailsDto get(Integer id) {
+        return toDetailsDto(findOrThrow(id));
+    }
+
+    public List<LabWorkDto> list() {
+        return repository.findAll().stream().map(this::toDto).toList();
+    }
+
+    @Transactional
+    public LabWorkDto update(Integer id, LabWorkDto dto) {
+        LabWork entity = findOrThrow(id);
+        fill(entity, dto);
+        return toDto(entity);
+    }
+
+    @Transactional
+    public void delete(Integer id) {
+        repository.delete(findOrThrow(id));
+    }
+
+    private LabWork findOrThrow(Integer id) {
+        LabWork entity = repository.find(id);
+        if (entity == null) {
+            throw new NotFoundException("LabWork " + id + " не найдена");
+        }
+        return entity;
+    }
+
+    private void fill(LabWork entity, LabWorkDto dto) {
+        entity.setName(dto.name());
+        entity.setCoordinates(requireRef(coordinatesRepository, dto.coordinatesId(), "coordinatesId"));
+        entity.setDescription(dto.description());
+        entity.setDifficulty(dto.difficulty());
+        entity.setDiscipline(dto.disciplineId() == null
+                ? null
+                : requireRef(disciplineRepository, dto.disciplineId(), "disciplineId"));
+        entity.setMinimalPoint(dto.minimalPoint());
+        entity.setPersonalQualitiesMinimum(dto.personalQualitiesMinimum());
+        entity.setAuthor(requireRef(personRepository, dto.authorId(), "authorId"));
+    }
+
+    private <T> T requireRef(BaseRepository<T, Long> refRepository, Long id, String field) {
+        T entity = refRepository.find(id);
+        if (entity == null) {
+            throw new ReferenceNotFoundException(field, "Объект с id " + id + " не найден");
+        }
+        return entity;
+    }
+
+    private LabWorkDto toDto(LabWork entity) {
+        return new LabWorkDto(entity.getId(), entity.getName(), entity.getCoordinates().getId(),
+                entity.getCreationDate(), entity.getDescription(), entity.getDifficulty(),
+                entity.getDiscipline() == null ? null : entity.getDiscipline().getId(),
+                entity.getMinimalPoint(), entity.getPersonalQualitiesMinimum(),
+                entity.getAuthor().getId());
+    }
+
+    private LabWorkDetailsDto toDetailsDto(LabWork entity) {
+        return new LabWorkDetailsDto(entity.getId(), entity.getName(),
+                coordinatesService.toDto(entity.getCoordinates()),
+                entity.getCreationDate(), entity.getDescription(), entity.getDifficulty(),
+                entity.getDiscipline() == null ? null : disciplineService.toDto(entity.getDiscipline()),
+                entity.getMinimalPoint(), entity.getPersonalQualitiesMinimum(),
+                personService.toDetailsDto(entity.getAuthor()));
+    }
+}

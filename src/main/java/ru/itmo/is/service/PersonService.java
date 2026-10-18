@@ -5,6 +5,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import java.util.List;
+import ru.itmo.is.dto.PersonDetailsDto;
 import ru.itmo.is.dto.PersonDto;
 import ru.itmo.is.model.Location;
 import ru.itmo.is.model.Person;
@@ -19,6 +20,9 @@ public class PersonService {
 
     @Inject
     LocationRepository locationRepository;
+
+    @Inject
+    LocationService locationService;
 
     @Transactional
     public PersonDto create(PersonDto dto) {
@@ -76,10 +80,17 @@ public class PersonService {
         return location;
     }
 
-    private PersonDto toDto(Person entity) {
+    public PersonDto toDto(Person entity) {
         Location location = entity.getLocation();
         return new PersonDto(entity.getId(), entity.getName(), entity.getEyeColor(),
                 entity.getHairColor(), location == null ? null : location.getId(),
+                entity.getHeight(), entity.getNationality());
+    }
+
+    public PersonDetailsDto toDetailsDto(Person entity) {
+        Location location = entity.getLocation();
+        return new PersonDetailsDto(entity.getId(), entity.getName(), entity.getEyeColor(),
+                entity.getHairColor(), location == null ? null : locationService.toDto(location),
                 entity.getHeight(), entity.getNationality());
     }
 }

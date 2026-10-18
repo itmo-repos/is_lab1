@@ -56,7 +56,7 @@ public class CoordinatesService {
         entity.setY(dto.y());
     }
 
-    private CoordinatesDto toDto(Coordinates entity) {
+    public CoordinatesDto toDto(Coordinates entity) {
         return new CoordinatesDto(entity.getId(), entity.getX(), entity.getY());
     }
 }
