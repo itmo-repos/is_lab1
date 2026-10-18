@@ -120,7 +120,7 @@ public class LabWorkService {
         return entity;
     }
 
-    private LabWorkDto toDto(LabWork entity) {
+    public LabWorkDto toDto(LabWork entity) {
         return new LabWorkDto(entity.getId(), entity.getName(), entity.getCoordinates().getId(),
                 entity.getCreationDate(), entity.getDescription(), entity.getDifficulty(),
                 entity.getDiscipline() == null ? null : entity.getDiscipline().getId(),
