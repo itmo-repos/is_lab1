@@ -10,12 +10,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 @Entity
@@ -36,7 +34,7 @@ public class LabWork {
     private Coordinates coordinates;
 
     @Convert(converter = ZonedDateTimeConverter.class)
-    @Column(name = "creation_date", nullable = false, updatable = false)
+    @Column(name = "creation_date", nullable = false, insertable = false, updatable = false)
     private ZonedDateTime creationDate;
 
     @NotNull
@@ -66,11 +64,6 @@ public class LabWork {
     private Person author;
 
     public LabWork() {
-    }
-
-    @PrePersist
-    private void onCreate() {
-        creationDate = ZonedDateTime.now(ZoneOffset.UTC);
     }
 
     public Integer getId() {

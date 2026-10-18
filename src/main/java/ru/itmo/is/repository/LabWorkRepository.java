@@ -38,6 +38,13 @@ public class LabWorkRepository extends BaseRepository<LabWork, Integer> {
         super(LabWork.class);
     }
 
+    @Override
+    public LabWork save(LabWork entity) {
+        super.save(entity);
+        em.refresh(entity);
+        return entity;
+    }
+
     public List<LabWork> findPage(Map<String, String> filters, String sort, boolean ascending,
                                   int page, int size) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
