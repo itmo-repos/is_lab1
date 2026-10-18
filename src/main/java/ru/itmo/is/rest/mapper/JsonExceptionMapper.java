@@ -1,4 +1,4 @@
-package ru.itmo.is.rest;
+package ru.itmo.is.rest.mapper;
 
 import jakarta.json.bind.JsonbException;
 import jakarta.ws.rs.ProcessingException;

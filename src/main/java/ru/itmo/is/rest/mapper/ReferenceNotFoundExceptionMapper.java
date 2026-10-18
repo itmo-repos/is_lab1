@@ -1,4 +1,4 @@
-package ru.itmo.is.rest;
+package ru.itmo.is.rest.mapper;
 
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;

@@ -1,4 +1,4 @@
-package ru.itmo.is.rest;
+package ru.itmo.is.rest.mapper;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
