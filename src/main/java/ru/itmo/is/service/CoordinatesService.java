@@ -18,8 +18,7 @@ public class CoordinatesService {
     @Transactional
     public CoordinatesDto create(CoordinatesDto dto) {
         Coordinates entity = new Coordinates();
-        entity.setX(dto.x());
-        entity.setY(dto.y());
+        fill(entity, dto);
         repository.save(entity);
         return toDto(entity);
     }
@@ -35,8 +34,7 @@ public class CoordinatesService {
     @Transactional
     public CoordinatesDto update(Long id, CoordinatesDto dto) {
         Coordinates entity = findOrThrow(id);
-        entity.setX(dto.x());
-        entity.setY(dto.y());
+        fill(entity, dto);
         return toDto(entity);
     }
 
@@ -51,6 +49,11 @@ public class CoordinatesService {
             throw new NotFoundException("Coordinates " + id + " не найдены");
         }
         return entity;
+    }
+
+    private void fill(Coordinates entity, CoordinatesDto dto) {
+        entity.setX(dto.x());
+        entity.setY(dto.y());
     }
 
     private CoordinatesDto toDto(Coordinates entity) {
