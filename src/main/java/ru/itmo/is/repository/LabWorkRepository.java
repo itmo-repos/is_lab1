@@ -6,6 +6,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.From;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Nulls;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -53,7 +54,8 @@ public class LabWorkRepository extends BaseRepository<LabWork, Integer> {
         Path<?> sortPath = path(root, sort);
         query.select(root)
                 .where(predicates(cb, root, filters))
-                .orderBy(ascending ? cb.asc(sortPath) : cb.desc(sortPath), cb.asc(root.get("id")));
+                .orderBy(ascending ? cb.asc(sortPath, Nulls.LAST) : cb.desc(sortPath, Nulls.LAST),
+                        cb.asc(root.get("id")));
         return em.createQuery(query)
                 .setFirstResult(page * size)
                 .setMaxResults(size)
