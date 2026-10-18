@@ -90,7 +90,7 @@ public class LabWorkService {
     private <T> T requireRef(BaseRepository<T, Long> refRepository, Long id, String field) {
         T entity = refRepository.find(id);
         if (entity == null) {
-            throw new ReferenceNotFoundException(field, "Объект с id " + id + " не найден");
+            throw new FieldException(field, "Объект с id " + id + " не найден");
         }
         return entity;
     }

@@ -7,13 +7,13 @@ import jakarta.ws.rs.ext.Provider;
 import java.util.List;
 import java.util.Map;
 import ru.itmo.is.dto.FieldErrorDto;
-import ru.itmo.is.service.ReferenceNotFoundException;
+import ru.itmo.is.service.FieldException;
 
 @Provider
-public class ReferenceNotFoundExceptionMapper implements ExceptionMapper<ReferenceNotFoundException> {
+public class FieldExceptionMapper implements ExceptionMapper<FieldException> {
 
     @Override
-    public Response toResponse(ReferenceNotFoundException e) {
+    public Response toResponse(FieldException e) {
         return Response.status(Response.Status.BAD_REQUEST)
                 .type(MediaType.APPLICATION_JSON)
                 .entity(Map.of("errors", List.of(new FieldErrorDto(e.getField(), e.getMessage()))))

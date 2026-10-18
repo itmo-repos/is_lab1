@@ -75,7 +75,7 @@ public class PersonService {
         }
         Location location = locationRepository.find(locationId);
         if (location == null) {
-            throw new ReferenceNotFoundException("locationId", "Location " + locationId + " не найдена");
+            throw new FieldException("locationId", "Location " + locationId + " не найдена");
         }
         return location;
     }

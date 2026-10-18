@@ -1,10 +1,10 @@
 package ru.itmo.is.service;
 
-public class ReferenceNotFoundException extends RuntimeException {
+public class FieldException extends RuntimeException {
 
     private final String field;
 
-    public ReferenceNotFoundException(String field, String message) {
+    public FieldException(String field, String message) {
         super(message);
         this.field = field;
     }
