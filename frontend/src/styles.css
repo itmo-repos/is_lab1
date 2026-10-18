@@ -104,6 +104,7 @@ th select {
 .overlay {
   position: fixed;
   inset: 0;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -295,4 +296,89 @@ button.danger {
 .result-table {
   max-height: 260px;
   overflow-y: auto;
+}
+
+.chart {
+  width: 100%;
+  height: auto;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.chart .grid {
+  stroke: #eee;
+}
+
+.chart .axis {
+  stroke: #999;
+}
+
+.chart text {
+  font-size: 12px;
+  fill: #666;
+}
+
+.cluster {
+  cursor: pointer;
+}
+
+.cluster:hover {
+  filter: brightness(0.9);
+}
+
+.cluster path,
+.cluster circle {
+  stroke: #fff;
+  stroke-width: 1.5;
+}
+
+.cluster .hole {
+  fill: #fff;
+  stroke: none;
+}
+
+.chart .cluster text {
+  font-size: 13px;
+  font-weight: 600;
+  fill: #222;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.legend-note {
+  color: #666;
+}
+
+.select-row {
+  display: flex;
+  gap: 6px;
+}
+
+.select-row select {
+  flex: 1;
+}
+
+.select-row button {
+  padding: 4px 10px;
+  font-weight: bold;
 }

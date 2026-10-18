@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import LabWorksPage from './pages/LabWorksPage';
+import VisualizationPage from './pages/VisualizationPage';
 import ReferencesPage from './pages/ReferencesPage';
 import SpecialPage from './pages/SpecialPage';
 
 const ROUTES = [
   { path: '#/labworks', title: 'Лабораторные', page: LabWorksPage },
+  { path: '#/visualization', title: 'Визуализация', page: VisualizationPage },
   { path: '#/references', title: 'Справочники', page: ReferencesPage },
   { path: '#/special', title: 'Спецоперации', page: SpecialPage },
 ];
