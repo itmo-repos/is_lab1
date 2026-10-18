@@ -184,3 +184,67 @@ th select {
 .actions button + button {
   margin-left: 4px;
 }
+
+button {
+  padding: 6px 12px;
+  font: inherit;
+  color: #222;
+  background: #fff;
+  border: 1px solid #b8c0cc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background: #eef1f6;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+button.primary {
+  color: #fff;
+  background: #3d5078;
+  border-color: #3d5078;
+}
+
+button.primary:hover:not(:disabled) {
+  background: #2f405f;
+}
+
+button.danger {
+  color: #b00020;
+  border-color: #e0a0aa;
+}
+
+.actions button {
+  padding: 2px 8px;
+  font-size: 13px;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.tabs button.active {
+  color: #fff;
+  background: #3d5078;
+  border-color: #3d5078;
+}
+
+.ref-table {
+  max-width: 900px;
+}
+
+.ref-table th {
+  background: #eef1f6;
+}
+
+.modal select {
+  width: 100%;
+  padding: 6px;
+}

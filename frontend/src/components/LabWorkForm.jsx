@@ -127,7 +127,7 @@ export default function LabWorkForm({ labWork, onSaved, onCancel }) {
       </FormField>
       {message && <p className="error">{message}</p>}
       <div className="form-buttons">
-        <button type="submit">Сохранить</button>
+        <button type="submit" className="primary">Сохранить</button>
         <button type="button" onClick={onCancel}>Отмена</button>
       </div>
     </form>

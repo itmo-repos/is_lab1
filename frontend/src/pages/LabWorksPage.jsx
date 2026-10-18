@@ -114,7 +114,7 @@ export default function LabWorksPage() {
     <section>
       <h1>Лабораторные работы</h1>
       <div className="toolbar">
-        <button type="button" onClick={() => setDialog({ type: 'create' })}>Создать</button>
+        <button type="button" className="primary" onClick={() => setDialog({ type: 'create' })}>Создать</button>
         <form onSubmit={openById}>
           <input type="number" min="1" step="1" placeholder="ID" value={searchId}
                  onChange={(e) => setSearchId(e.target.value)} required />
@@ -180,7 +180,7 @@ export default function LabWorksPage() {
                 <td className="actions">
                   <button type="button" onClick={() => setDialog({ type: 'view', labWork: row })}>Подробнее</button>
                   <button type="button" onClick={() => setDialog({ type: 'edit', labWork: row })}>Изменить</button>
-                  <button type="button" onClick={() => setDialog({ type: 'delete', labWork: row })}>Удалить</button>
+                  <button type="button" className="danger" onClick={() => setDialog({ type: 'delete', labWork: row })}>Удалить</button>
                 </td>
               </tr>
             ))}

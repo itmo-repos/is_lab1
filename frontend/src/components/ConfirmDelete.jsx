@@ -16,7 +16,7 @@ export default function ConfirmDelete({ text, onConfirm, onCancel }) {
       <p>{text}</p>
       {message && <p className="error">{message}</p>}
       <div className="form-buttons">
-        <button type="button" onClick={confirm}>Удалить</button>
+        <button type="button" className="danger" onClick={confirm}>Удалить</button>
         <button type="button" onClick={onCancel}>Отмена</button>
       </div>
     </div>
