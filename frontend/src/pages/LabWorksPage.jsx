@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { api } from '../api';
 import { COLUMNS, GROUP_ROW, cellValue } from '../columns';
+import LabWorkForm from '../components/LabWorkForm';
+import Modal from '../components/Modal';
 import { useChanges } from '../events';
 
 const PAGE_SIZES = [5, 10, 20, 50];
@@ -15,6 +17,7 @@ export default function LabWorksPage() {
   const [order, setOrder] = useState('asc');
   const [filters, setFilters] = useState({});
   const [reloadKey, setReloadKey] = useState(0);
+  const [creating, setCreating] = useState(false);
   const typing = useRef(false);
 
   useChanges(() => setReloadKey((key) => key + 1));
@@ -85,6 +88,12 @@ export default function LabWorksPage() {
   return (
     <section>
       <h1>Лабораторные работы</h1>
+      <button type="button" onClick={() => setCreating(true)}>Создать</button>
+      {creating && (
+        <Modal title="Создание лабораторной" onClose={() => setCreating(false)}>
+          <LabWorkForm onSaved={() => setCreating(false)} onCancel={() => setCreating(false)} />
+        </Modal>
+      )}
       {error && <p className="error">{error}</p>}
       <div className={loading ? 'table-wrap loading' : 'table-wrap'}>
         <table>
